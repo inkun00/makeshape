@@ -3,8 +3,20 @@ import { getCertificateLevel } from '../data/certificateLevels';
 
 const UPLOAD_URL = 'https://samboard.vivasam.com/studentEntry/?brdId=brd-0QN1PMGJ84W3T';
 const CHARACTER_SHEET_URLS = {
-  boy: '/certificate-characters-boy.png',
-  girl: '/certificate-characters-girl.png'
+  boy: [
+    '/certificate-characters-boy.png',
+    '/certificate-characters-boy-2.png',
+    '/certificate-characters-boy-3.png',
+    '/certificate-characters-boy-4.png',
+    '/certificate-characters-boy-5.png'
+  ],
+  girl: [
+    '/certificate-characters-girl.png',
+    '/certificate-characters-girl-2.png',
+    '/certificate-characters-girl-3.png',
+    '/certificate-characters-girl-4.png',
+    '/certificate-characters-girl-5.png'
+  ]
 };
 
 const CHARACTER_SET_LABELS = {
@@ -271,6 +283,9 @@ function drawCertificate(canvas, stats, characterSheet = null) {
 export default function CertificateModal({ open, onClose, stats }) {
   const canvasRef = useRef(null);
   const [characterSet, setCharacterSet] = useState('boy');
+  const [characterVariant, setCharacterVariant] = useState(0);
+  const characterSheetUrl = CHARACTER_SHEET_URLS[characterSet][characterVariant];
+  const characterVariantCount = CHARACTER_SHEET_URLS[characterSet].length;
 
   useEffect(() => {
     if (!open || !canvasRef.current) return;
@@ -289,12 +304,12 @@ export default function CertificateModal({ open, onClose, stats }) {
         drawCertificate(canvas, stats);
       }
     };
-    image.src = CHARACTER_SHEET_URLS[characterSet];
+    image.src = characterSheetUrl;
 
     return () => {
       cancelled = true;
     };
-  }, [open, stats, characterSet]);
+  }, [open, stats, characterSheetUrl]);
 
   if (!open) return null;
 
@@ -311,7 +326,7 @@ export default function CertificateModal({ open, onClose, stats }) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `makeshape-certificate-${characterSet}-level-${levelInfo.level}.png`;
+      link.download = `makeshape-certificate-${characterSet}-${characterVariant + 1}-level-${levelInfo.level}.png`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -356,6 +371,12 @@ export default function CertificateModal({ open, onClose, stats }) {
                 </button>
               ))}
             </div>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setCharacterVariant(prev => (prev + 1) % characterVariantCount)}
+            >
+              캐릭터 바꾸기 ({characterVariant + 1}/{characterVariantCount})
+            </button>
             <button className="btn btn-primary" onClick={handleSave}>
               이미지 저장
             </button>
