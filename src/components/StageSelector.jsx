@@ -7,7 +7,12 @@ const CATEGORIES = [
   { key: 'flip_2', name: '도형 뒤집기 2', description: '복잡한 도형의 좌우/상하 뒤집기' }
 ];
 
-export default function StageSelector({ solvedStages = {}, onSelectProblem }) {
+export default function StageSelector({
+  solvedStages = {},
+  allStagesCleared = false,
+  onOpenCertificate,
+  onSelectProblem
+}) {
   const getProgress = (categoryKey) => {
     const categoryProblems = problems.filter(p => p.category === categoryKey);
     const total = categoryProblems.length;
@@ -21,12 +26,19 @@ export default function StageSelector({ solvedStages = {}, onSelectProblem }) {
   };
 
   return (
-    <div className="stage-selector-container">
+      <div className="stage-selector-container">
       <div className="glass-panel intro-panel">
-        <h1>초등 평면도형 이동 학습</h1>
-        <p>
-          도형을 돌리고 뒤집으며 공간 지각 능력을 익혀 보세요. 문제를 선택해 정답 도형을 직접 그릴 수 있습니다.
-        </p>
+        <div>
+          <h1>초등 평면도형 이동 학습</h1>
+          <p>
+            도형을 돌리고 뒤집으며 공간 지각 능력을 익혀 보세요. 문제를 선택해 정답 도형을 직접 그릴 수 있습니다.
+          </p>
+        </div>
+        {allStagesCleared && (
+          <button className="btn btn-primary" onClick={onOpenCertificate}>
+            인증서 보기
+          </button>
+        )}
       </div>
 
       {CATEGORIES.map((cat) => {

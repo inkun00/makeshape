@@ -42,7 +42,7 @@ function OperationArrow({ label, axis = 'horizontal' }) {
   );
 }
 
-export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange, isSolvedPrev }) {
+export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange, onPenalty, isSolvedPrev }) {
   const [userVertices, setUserVertices] = useState([]);
   const [intermediateUserVertices, setIntermediateUserVertices] = useState([]);
   const [originalUserVertices, setOriginalUserVertices] = useState([]);
@@ -64,6 +64,10 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
     window.setTimeout(() => {
       setToast({ show: false, message: '', type });
     }, 2500);
+  };
+
+  const registerWrongAttempt = () => {
+    onPenalty?.('wrong');
   };
 
   const clearIncorrect = () => {
@@ -117,6 +121,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
 
   const checkSingleTarget = () => {
     if (userVertices.length < 3) {
+      registerWrongAttempt();
       triggerToast('도형을 그리려면 꼭짓점을 3개 이상 찍어 주세요.', 'error');
       return;
     }
@@ -129,6 +134,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
       onSolveStatusChange(problem.id, true);
       triggerToast('잘했어요! 정답입니다.', 'success');
     } else {
+      registerWrongAttempt();
       setIsIncorrect(true);
       triggerToast('다시 생각해 볼까요? 모양과 위치를 확인해 보세요.', 'error');
       window.setTimeout(() => setIsIncorrect(false), 500);
@@ -137,6 +143,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
 
   const checkDoubleFlipWithUserIntermediate = () => {
     if (intermediateUserVertices.length < 3 || userVertices.length < 3) {
+      registerWrongAttempt();
       triggerToast('중간 도형과 최종 도형을 모두 그려 주세요.', 'error');
       return;
     }
@@ -149,6 +156,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
       onSolveStatusChange(problem.id, true);
       triggerToast('잘했어요! 중간 도형과 최종 도형이 모두 맞습니다.', 'success');
     } else {
+      registerWrongAttempt();
       setIsIncorrect(true);
       triggerToast('중간 도형과 최종 도형의 모양과 위치를 다시 확인해 보세요.', 'error');
       window.setTimeout(() => setIsIncorrect(false), 500);
@@ -157,6 +165,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
 
   const checkReverseDoubleFlip = () => {
     if (originalUserVertices.length < 3 || intermediateUserVertices.length < 3) {
+      registerWrongAttempt();
       triggerToast('처음 도형과 그 전 단계 도형을 모두 그려 주세요.', 'error');
       return;
     }
@@ -169,6 +178,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
       onSolveStatusChange(problem.id, true);
       triggerToast('잘했어요! 처음 도형과 그 전 단계 도형이 모두 맞습니다.', 'success');
     } else {
+      registerWrongAttempt();
       setIsIncorrect(true);
       triggerToast('처음 도형과 그 전 단계 도형의 위치를 다시 확인해 보세요.', 'error');
       window.setTimeout(() => setIsIncorrect(false), 500);
@@ -202,6 +212,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
 
   const handleShowHint = () => {
     setHintActive(true);
+    onPenalty?.('hint');
     triggerToast('정답의 윤곽선을 초록색 점선으로 표시했습니다.', 'success');
   };
 

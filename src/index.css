@@ -209,6 +209,10 @@ body {
 }
 
 .intro-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
   padding: 32px;
   text-align: left;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%);
@@ -226,6 +230,10 @@ body {
   color: var(--text-secondary);
   font-size: 1.1rem;
   margin: 0;
+}
+
+.intro-panel .btn {
+  flex: 0 0 auto;
 }
 
 .category-section {
@@ -730,6 +738,83 @@ body {
   background: var(--color-incorrect);
 }
 
+/* Certificate modal */
+.certificate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.64);
+  backdrop-filter: blur(10px);
+}
+
+.certificate-modal {
+  width: min(960px, 100%);
+  max-height: min(92vh, 920px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+  animation: fadeIn 0.22s ease-out;
+}
+
+.certificate-header,
+.certificate-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.certificate-kicker {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.certificate-header h2 {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.certificate-preview {
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.certificate-preview canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.certificate-level-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.certificate-level-summary strong {
+  font-size: 1rem;
+}
+
+.certificate-level-summary span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
 /* Compass widget for rotation direction representation */
 .compass-widget {
   position: relative;
@@ -814,6 +899,13 @@ body {
   
   .stage-grid {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+
+  .intro-panel,
+  .certificate-header,
+  .certificate-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
