@@ -9,7 +9,7 @@ const PRESETS = [
   { name: '블록 F', vertices: [[2, 1], [4, 1], [4, 2], [3, 2], [3, 3], [5, 3], [5, 4], [3, 4], [3, 5], [5, 5], [5, 6], [2, 6], [2, 1]] }
 ];
 
-const ANIMATION_MS = 1850;
+const ANIMATION_MS = 2775;
 
 const isClosedPolygon = (vertices) => (
   vertices.length > 2 &&

@@ -276,7 +276,7 @@ export default function GridCanvas({
           style={{
             transformOrigin: `${width / 2}px ${width / 2}px`,
             transform: getSimulatingTransformStyle(simulatingAction, simulatingState),
-            transition: 'transform 1.8s cubic-bezier(0.25, 1, 0.5, 1)',
+            transition: 'transform 2.7s cubic-bezier(0.25, 1, 0.5, 1)',
             fill: 'rgba(59, 130, 246, 0.45)',
             stroke: 'var(--color-original)',
             strokeWidth: 3.5,

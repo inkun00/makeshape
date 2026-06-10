@@ -43,6 +43,7 @@ function OperationArrow({ label, axis = 'horizontal' }) {
 }
 
 const MAX_HINT_USES = 10;
+const SIMULATION_CHECK_DELAY_MS = 2800;
 
 export default function PlayStage({
   problem,
@@ -218,7 +219,7 @@ export default function PlayStage({
     window.setTimeout(() => {
       checkSingleTarget();
       setIsSimulating(false);
-    }, 1900);
+    }, SIMULATION_CHECK_DELAY_MS);
   };
 
   const handleShowHint = () => {
