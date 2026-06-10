@@ -49,6 +49,7 @@ const FLIP_SIMULATION_MS = 4200;
 
 const getRotationTargetAngle = (action) => {
   if (!action.startsWith('rotate')) return 0;
+  if (action.includes('360')) return 360;
   if (action.includes('270')) return 270;
   if (action.includes('180')) return 180;
   return 90;

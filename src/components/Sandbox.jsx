@@ -9,12 +9,27 @@ const PRESETS = [
   { name: '블록 F', vertices: [[2, 1], [4, 1], [4, 2], [3, 2], [3, 3], [5, 3], [5, 4], [3, 4], [3, 5], [5, 5], [5, 6], [2, 6], [2, 1]] }
 ];
 
+const ROTATION_DIRECTIONS = [
+  { value: 'cw', label: '시계' },
+  { value: 'ccw', label: '반시계' }
+];
+
+const ROTATION_ANGLES = [90, 180, 270, 360];
+
+const FLIP_ACTIONS = [
+  { action: 'flip_up', label: '위' },
+  { action: 'flip_down', label: '아래' },
+  { action: 'flip_left', label: '왼쪽' },
+  { action: 'flip_right', label: '오른쪽' }
+];
+
 const ROTATION_STEP_MS = 1400;
 const ROTATION_PAUSE_MS = 500;
 const FLIP_ANIMATION_MS = 4165;
 
 const getRotationTargetAngle = (action) => {
   if (!action.startsWith('rotate')) return 0;
+  if (action.includes('360')) return 360;
   if (action.includes('270')) return 270;
   if (action.includes('180')) return 180;
   return 90;
@@ -31,6 +46,8 @@ export default function Sandbox() {
   const [history, setHistory] = useState([PRESETS[0].vertices]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [animation, setAnimation] = useState(null);
+  const [rotationDirection, setRotationDirection] = useState('cw');
+  const [rotationAngle, setRotationAngle] = useState(90);
 
   const updateVertices = (newVertices) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -99,6 +116,10 @@ export default function Sandbox() {
     }, animationMs);
   };
 
+  const handleRotate = () => {
+    handleAction(`rotate_${rotationDirection}_${rotationAngle}`);
+  };
+
   const handlePresetSelect = (presetVertices) => {
     if (animation) return;
     updateVertices(presetVertices);
@@ -149,31 +170,48 @@ export default function Sandbox() {
 
         <div className="tools-group">
           <h3>도형 돌리기</h3>
-          <div className="tools-grid">
-            <button className="btn btn-secondary" onClick={() => handleAction('rotate_cw_90')} disabled={vertices.length === 0 || isBusy}>
-              시계 90도
-            </button>
-            <button className="btn btn-secondary" onClick={() => handleAction('rotate_cw_180')} disabled={vertices.length === 0 || isBusy}>
-              180도
-            </button>
-            <button className="btn btn-secondary" onClick={() => handleAction('rotate_ccw_90')} disabled={vertices.length === 0 || isBusy}>
-              반시계 90도
-            </button>
-            <button className="btn btn-secondary" onClick={() => handleAction('rotate_cw_270')} disabled={vertices.length === 0 || isBusy}>
-              시계 270도
-            </button>
+          <div className="tool-choice-row">
+            {ROTATION_DIRECTIONS.map((direction) => (
+              <button
+                key={direction.value}
+                className={`btn ${rotationDirection === direction.value ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setRotationDirection(direction.value)}
+                disabled={isBusy}
+              >
+                {direction.label}
+              </button>
+            ))}
           </div>
+          <div className="tools-grid">
+            {ROTATION_ANGLES.map((angle) => (
+              <button
+                key={angle}
+                className={`btn ${rotationAngle === angle ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setRotationAngle(angle)}
+                disabled={isBusy}
+              >
+                {angle}도
+              </button>
+            ))}
+          </div>
+          <button className="btn btn-success tool-action-button" onClick={handleRotate} disabled={vertices.length === 0 || isBusy}>
+            선택한 방향으로 돌리기
+          </button>
         </div>
 
         <div className="tools-group">
           <h3>도형 뒤집기</h3>
           <div className="tools-grid">
-            <button className="btn btn-secondary" onClick={() => handleAction('flip_right')} disabled={vertices.length === 0 || isBusy}>
-              좌우
-            </button>
-            <button className="btn btn-secondary" onClick={() => handleAction('flip_down')} disabled={vertices.length === 0 || isBusy}>
-              상하
-            </button>
+            {FLIP_ACTIONS.map((flip) => (
+              <button
+                key={flip.action}
+                className="btn btn-secondary"
+                onClick={() => handleAction(flip.action)}
+                disabled={vertices.length === 0 || isBusy}
+              >
+                {flip.label}
+              </button>
+            ))}
           </div>
         </div>
 

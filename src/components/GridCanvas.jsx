@@ -376,7 +376,7 @@ const getRotationInfo = (action) => {
 
   return {
     direction: action.startsWith('rotate_cw') ? 1 : -1,
-    target: action.includes('270') ? 270 : action.includes('180') ? 180 : 90
+    target: action.includes('360') ? 360 : action.includes('270') ? 270 : action.includes('180') ? 180 : 90
   };
 };
 
@@ -403,12 +403,16 @@ const getSimulatingTransformStyle = (action, state, rotationDegrees = 0) => {
       return 'rotate(180deg)';
     case 'rotate_cw_270':
       return 'rotate(270deg)';
+    case 'rotate_cw_360':
+      return 'rotate(360deg)';
     case 'rotate_ccw_90':
       return 'rotate(-90deg)';
     case 'rotate_ccw_180':
       return 'rotate(-180deg)';
     case 'rotate_ccw_270':
       return 'rotate(-270deg)';
+    case 'rotate_ccw_360':
+      return 'rotate(-360deg)';
     case 'flip_left':
     case 'flip_right':
       return 'scaleX(-1)';

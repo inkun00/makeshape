@@ -630,6 +630,16 @@ body {
   font-size: 0.82rem;
 }
 
+.tool-choice-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.tool-action-button {
+  width: 100%;
+}
+
 .tools-footer {
   margin-top: auto;
 }

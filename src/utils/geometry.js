@@ -9,9 +9,11 @@ const ACTION_LABELS = {
   rotate_cw_90: '시계 방향으로 90도 돌리기',
   rotate_cw_180: '시계 방향으로 180도 돌리기',
   rotate_cw_270: '시계 방향으로 270도 돌리기',
+  rotate_cw_360: '시계 방향으로 360도 돌리기',
   rotate_ccw_90: '시계 반대 방향으로 90도 돌리기',
   rotate_ccw_180: '시계 반대 방향으로 180도 돌리기',
   rotate_ccw_270: '시계 반대 방향으로 270도 돌리기',
+  rotate_ccw_360: '시계 반대 방향으로 360도 돌리기',
   flip_left: '왼쪽으로 뒤집기',
   flip_right: '오른쪽으로 뒤집기',
   flip_up: '위쪽으로 뒤집기',
@@ -36,6 +38,9 @@ export function transformPoint([x, y], action) {
     case 'rotate_cw_270':
     case 'rotate_ccw_90':
       return [GRID_SIZE - y, x];
+    case 'rotate_cw_360':
+    case 'rotate_ccw_360':
+      return [x, y];
     case 'flip_left':
     case 'flip_right':
       return [GRID_SIZE - x, y];
