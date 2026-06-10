@@ -815,6 +815,26 @@ body {
   font-size: 0.9rem;
 }
 
+.certificate-action-controls,
+.certificate-set-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.certificate-set-toggle {
+  padding: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.certificate-set-toggle .btn {
+  min-width: 128px;
+}
+
 /* Compass widget for rotation direction representation */
 .compass-widget {
   position: relative;
@@ -906,6 +926,16 @@ body {
   .certificate-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .certificate-action-controls,
+  .certificate-set-toggle {
+    justify-content: stretch;
+  }
+
+  .certificate-action-controls .btn,
+  .certificate-set-toggle .btn {
+    flex: 1 1 140px;
   }
 }
 

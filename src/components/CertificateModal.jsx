@@ -1,8 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getCertificateLevel } from '../data/certificateLevels';
 
 const UPLOAD_URL = 'https://samboard.vivasam.com/studentEntry/?brdId=brd-0QN1PMGJ84W3T';
-const CHARACTER_SHEET_URL = '/certificate-characters.png';
+const CHARACTER_SHEET_URLS = {
+  boy: '/certificate-characters-boy.png',
+  girl: '/certificate-characters-girl.png'
+};
+
+const CHARACTER_SET_LABELS = {
+  boy: '남학생 캐릭터',
+  girl: '여학생 캐릭터'
+};
 
 function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.beginPath();
@@ -262,6 +270,7 @@ function drawCertificate(canvas, stats, characterSheet = null) {
 
 export default function CertificateModal({ open, onClose, stats }) {
   const canvasRef = useRef(null);
+  const [characterSet, setCharacterSet] = useState('boy');
 
   useEffect(() => {
     if (!open || !canvasRef.current) return;
@@ -280,12 +289,12 @@ export default function CertificateModal({ open, onClose, stats }) {
         drawCertificate(canvas, stats);
       }
     };
-    image.src = CHARACTER_SHEET_URL;
+    image.src = CHARACTER_SHEET_URLS[characterSet];
 
     return () => {
       cancelled = true;
     };
-  }, [open, stats]);
+  }, [open, stats, characterSet]);
 
   if (!open) return null;
 
@@ -302,7 +311,7 @@ export default function CertificateModal({ open, onClose, stats }) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `makeshape-certificate-level-${levelInfo.level}.png`;
+      link.download = `makeshape-certificate-${characterSet}-level-${levelInfo.level}.png`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -335,9 +344,22 @@ export default function CertificateModal({ open, onClose, stats }) {
             <strong>{levelInfo.level}단계 · {levelInfo.title}</strong>
             <span>오답과 힌트 합계 {totalPenalty}회 기준</span>
           </div>
-          <button className="btn btn-primary" onClick={handleSave}>
-            이미지 저장
-          </button>
+          <div className="certificate-action-controls">
+            <div className="certificate-set-toggle" aria-label="캐릭터 세트 선택">
+              {Object.entries(CHARACTER_SET_LABELS).map(([key, label]) => (
+                <button
+                  key={key}
+                  className={`btn ${characterSet === key ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => setCharacterSet(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button className="btn btn-primary" onClick={handleSave}>
+              이미지 저장
+            </button>
+          </div>
         </div>
       </div>
     </div>
