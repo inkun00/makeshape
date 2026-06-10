@@ -19,7 +19,9 @@ export default function GridCanvas({
   isSimulating = false,
   simulatingVertices = null,
   simulatingAction = '',
-  simulatingState = 'start'
+  simulatingState = 'start',
+  simulatingRotationDegrees = 0,
+  simulatingTransitionMs = 4050
 }) {
   const svgRef = useRef(null);
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -271,20 +273,46 @@ export default function GridCanvas({
 
       {/* 6.5. Simulation Overlay Shape */}
       {isSimulating && simulatingVertices && (
-        <path
-          d={verticesToSvgPath(simulatingVertices, cellSize, true)}
-          style={{
-            transformOrigin: `${width / 2}px ${width / 2}px`,
-            transform: getSimulatingTransformStyle(simulatingAction, simulatingState),
-            transition: 'transform 4.05s linear',
-            fill: 'rgba(59, 130, 246, 0.45)',
-            stroke: 'var(--color-original)',
-            strokeWidth: 3.5,
-            strokeLinejoin: 'round',
-            strokeLinecap: 'round',
-            pointerEvents: 'none'
-          }}
-        />
+        <>
+          <path
+            d={verticesToSvgPath(simulatingVertices, cellSize, true)}
+            style={{
+              transformOrigin: `${width / 2}px ${width / 2}px`,
+              transform: getSimulatingTransformStyle(simulatingAction, simulatingState, simulatingRotationDegrees),
+              transition: `transform ${simulatingTransitionMs}ms linear`,
+              fill: 'rgba(59, 130, 246, 0.45)',
+              stroke: 'var(--color-original)',
+              strokeWidth: 3.5,
+              strokeLinejoin: 'round',
+              strokeLinecap: 'round',
+              pointerEvents: 'none'
+            }}
+          />
+          {getRotationDisplayText(simulatingAction, simulatingRotationDegrees) && (
+            <g pointerEvents="none">
+              <rect
+                x={width / 2 - 72}
+                y={12}
+                width={144}
+                height={34}
+                rx={17}
+                fill="rgba(255, 255, 255, 0.94)"
+                stroke="var(--color-accent)"
+                strokeWidth={1.5}
+              />
+              <text
+                x={width / 2}
+                y={34}
+                textAnchor="middle"
+                fontSize="15"
+                fontWeight="800"
+                fill="var(--color-accent)"
+              >
+                {getRotationDisplayText(simulatingAction, simulatingRotationDegrees)}
+              </text>
+            </g>
+          )}
+        </>
       )}
 
       {/* 7. Draw vertices nodes */}
@@ -343,10 +371,31 @@ export default function GridCanvas({
 }
 
 // Helper for CSS animation transforms relative to center
-const getSimulatingTransformStyle = (action, state) => {
+const getRotationInfo = (action) => {
+  if (!action.startsWith('rotate')) return null;
+
+  return {
+    direction: action.startsWith('rotate_cw') ? 1 : -1,
+    target: action.includes('270') ? 270 : action.includes('180') ? 180 : 90
+  };
+};
+
+const getRotationDisplayText = (action, degrees) => {
+  const rotation = getRotationInfo(action);
+  if (!rotation) return '';
+  return `회전 ${Math.abs(degrees)}° / ${rotation.target}°`;
+};
+
+const getSimulatingTransformStyle = (action, state, rotationDegrees = 0) => {
   if (state === 'start') {
     return 'rotate(0deg) scale(1, 1)';
   }
+
+  const rotation = getRotationInfo(action);
+  if (rotation) {
+    return `rotate(${rotation.direction * Math.abs(rotationDegrees)}deg)`;
+  }
+
   switch (action) {
     case 'rotate_cw_90':
       return 'rotate(90deg)';

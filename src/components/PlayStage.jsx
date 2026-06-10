@@ -43,7 +43,15 @@ function OperationArrow({ label, axis = 'horizontal' }) {
 }
 
 const MAX_HINT_USES = 10;
-const SIMULATION_CHECK_DELAY_MS = 4200;
+const ROTATION_STEP_MS = 1400;
+const FLIP_SIMULATION_MS = 4200;
+
+const getRotationTargetAngle = (action) => {
+  if (!action.startsWith('rotate')) return 0;
+  if (action.includes('270')) return 270;
+  if (action.includes('180')) return 180;
+  return 90;
+};
 
 export default function PlayStage({
   problem,
@@ -62,6 +70,8 @@ export default function PlayStage({
   const [hintActive, setHintActive] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulatingState, setSimulatingState] = useState('start');
+  const [simulatingRotationDegrees, setSimulatingRotationDegrees] = useState(0);
+  const [simulatingTransitionMs, setSimulatingTransitionMs] = useState(4050);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   const intermediateVertices = problem.intermediateAction
@@ -111,6 +121,7 @@ export default function PlayStage({
     setIsSolved(false);
     setIsIncorrect(false);
     setHintActive(false);
+    setSimulatingRotationDegrees(0);
     onSolveStatusChange(problem.id, false);
   };
 
@@ -210,16 +221,38 @@ export default function PlayStage({
 
     setIsSimulating(true);
     setSimulatingState('start');
+    setSimulatingRotationDegrees(0);
     setIsIncorrect(false);
 
-    window.setTimeout(() => {
-      setSimulatingState('end');
-    }, 50);
+    const rotationTargetAngle = getRotationTargetAngle(problem.action);
+    const isRotation = rotationTargetAngle > 0;
+    const stepCount = Math.max(1, rotationTargetAngle / 90);
+    const simulationMs = isRotation ? stepCount * ROTATION_STEP_MS + 120 : FLIP_SIMULATION_MS;
+
+    if (isRotation) {
+      setSimulatingTransitionMs(ROTATION_STEP_MS);
+      window.setTimeout(() => {
+        setSimulatingState('end');
+        setSimulatingRotationDegrees(90);
+      }, 50);
+
+      for (let step = 2; step <= stepCount; step += 1) {
+        window.setTimeout(() => {
+          setSimulatingRotationDegrees(step * 90);
+        }, ROTATION_STEP_MS * (step - 1) + 50);
+      }
+    } else {
+      setSimulatingTransitionMs(FLIP_SIMULATION_MS);
+      window.setTimeout(() => {
+        setSimulatingState('end');
+      }, 50);
+    }
 
     window.setTimeout(() => {
       checkSingleTarget();
       setIsSimulating(false);
-    }, SIMULATION_CHECK_DELAY_MS);
+      setSimulatingRotationDegrees(0);
+    }, simulationMs);
   };
 
   const handleShowHint = () => {
@@ -319,6 +352,8 @@ export default function PlayStage({
         simulatingVertices={problem.originalVertices}
         simulatingAction={problem.action}
         simulatingState={simulatingState}
+        simulatingRotationDegrees={simulatingRotationDegrees}
+        simulatingTransitionMs={simulatingTransitionMs}
       />
     </CanvasPanel>
   );

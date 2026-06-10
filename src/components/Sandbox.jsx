@@ -9,7 +9,15 @@ const PRESETS = [
   { name: '블록 F', vertices: [[2, 1], [4, 1], [4, 2], [3, 2], [3, 3], [5, 3], [5, 4], [3, 4], [3, 5], [5, 5], [5, 6], [2, 6], [2, 1]] }
 ];
 
-const ANIMATION_MS = 4165;
+const ROTATION_STEP_MS = 1400;
+const FLIP_ANIMATION_MS = 4165;
+
+const getRotationTargetAngle = (action) => {
+  if (!action.startsWith('rotate')) return 0;
+  if (action.includes('270')) return 270;
+  if (action.includes('180')) return 180;
+  return 90;
+};
 
 const isClosedPolygon = (vertices) => (
   vertices.length > 2 &&
@@ -45,18 +53,46 @@ export default function Sandbox() {
     setAnimation({
       action: actionType,
       state: 'start',
+      rotationDegrees: 0,
+      transitionMs: FLIP_ANIMATION_MS,
       sourceVertices: [...vertices],
       nextVertices: transformed
     });
 
-    window.setTimeout(() => {
-      setAnimation(prev => prev ? { ...prev, state: 'end' } : prev);
-    }, 40);
+    const rotationTargetAngle = getRotationTargetAngle(actionType);
+    const isRotation = rotationTargetAngle > 0;
+    const stepCount = Math.max(1, rotationTargetAngle / 90);
+    const animationMs = isRotation ? stepCount * ROTATION_STEP_MS + 120 : FLIP_ANIMATION_MS;
+
+    if (isRotation) {
+      window.setTimeout(() => {
+        setAnimation(prev => prev ? {
+          ...prev,
+          state: 'end',
+          rotationDegrees: 90,
+          transitionMs: ROTATION_STEP_MS
+        } : prev);
+      }, 40);
+
+      for (let step = 2; step <= stepCount; step += 1) {
+        window.setTimeout(() => {
+          setAnimation(prev => prev ? { ...prev, rotationDegrees: step * 90 } : prev);
+        }, ROTATION_STEP_MS * (step - 1) + 40);
+      }
+    } else {
+      window.setTimeout(() => {
+        setAnimation(prev => prev ? {
+          ...prev,
+          state: 'end',
+          transitionMs: FLIP_ANIMATION_MS
+        } : prev);
+      }, 40);
+    }
 
     window.setTimeout(() => {
       updateVertices(transformed);
       setAnimation(null);
-    }, ANIMATION_MS);
+    }, animationMs);
   };
 
   const handlePresetSelect = (presetVertices) => {
@@ -174,6 +210,8 @@ export default function Sandbox() {
               simulatingVertices={animation?.sourceVertices}
               simulatingAction={animation?.action}
               simulatingState={animation?.state}
+              simulatingRotationDegrees={animation?.rotationDegrees}
+              simulatingTransitionMs={animation?.transitionMs}
             />
           </div>
         </div>
