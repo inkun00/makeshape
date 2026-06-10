@@ -190,14 +190,15 @@ function drawGeneratedCharacter(ctx, image, levelInfo, x, y) {
   const tileWidth = image.naturalWidth / columns;
   const tileHeight = image.naturalHeight / rows;
   const index = levelInfo.level - 1;
-  const sourceX = (index % columns) * tileWidth;
-  const sourceY = Math.floor(index / columns) * tileHeight;
+  const sourceX = (index % columns) * tileWidth + tileWidth * 0.08;
+  const sourceY = Math.floor(index / columns) * tileHeight + tileHeight * 0.05;
+  const sourceSize = Math.min(tileWidth * 0.84, tileHeight * 0.76);
 
   ctx.save();
   ctx.beginPath();
   ctx.arc(x, y, 205, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(image, sourceX, sourceY, tileWidth, tileHeight, x - 205, y - 205, 410, 410);
+  ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, x - 205, y - 205, 410, 410);
   ctx.restore();
 
   ctx.save();
