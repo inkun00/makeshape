@@ -10,6 +10,7 @@ const PRESETS = [
 ];
 
 const ROTATION_STEP_MS = 1400;
+const ROTATION_PAUSE_MS = 500;
 const FLIP_ANIMATION_MS = 4165;
 
 const getRotationTargetAngle = (action) => {
@@ -62,7 +63,10 @@ export default function Sandbox() {
     const rotationTargetAngle = getRotationTargetAngle(actionType);
     const isRotation = rotationTargetAngle > 0;
     const stepCount = Math.max(1, rotationTargetAngle / 90);
-    const animationMs = isRotation ? stepCount * ROTATION_STEP_MS + 120 : FLIP_ANIMATION_MS;
+    const rotationStepIntervalMs = ROTATION_STEP_MS + ROTATION_PAUSE_MS;
+    const animationMs = isRotation
+      ? stepCount * ROTATION_STEP_MS + Math.max(0, stepCount - 1) * ROTATION_PAUSE_MS + 120
+      : FLIP_ANIMATION_MS;
 
     if (isRotation) {
       window.setTimeout(() => {
@@ -77,7 +81,7 @@ export default function Sandbox() {
       for (let step = 2; step <= stepCount; step += 1) {
         window.setTimeout(() => {
           setAnimation(prev => prev ? { ...prev, rotationDegrees: step * 90 } : prev);
-        }, ROTATION_STEP_MS * (step - 1) + 40);
+        }, rotationStepIntervalMs * (step - 1) + 40);
       }
     } else {
       window.setTimeout(() => {

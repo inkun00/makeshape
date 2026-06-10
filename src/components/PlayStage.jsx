@@ -44,6 +44,7 @@ function OperationArrow({ label, axis = 'horizontal' }) {
 
 const MAX_HINT_USES = 10;
 const ROTATION_STEP_MS = 1400;
+const ROTATION_PAUSE_MS = 500;
 const FLIP_SIMULATION_MS = 4200;
 
 const getRotationTargetAngle = (action) => {
@@ -227,7 +228,10 @@ export default function PlayStage({
     const rotationTargetAngle = getRotationTargetAngle(problem.action);
     const isRotation = rotationTargetAngle > 0;
     const stepCount = Math.max(1, rotationTargetAngle / 90);
-    const simulationMs = isRotation ? stepCount * ROTATION_STEP_MS + 120 : FLIP_SIMULATION_MS;
+    const rotationStepIntervalMs = ROTATION_STEP_MS + ROTATION_PAUSE_MS;
+    const simulationMs = isRotation
+      ? stepCount * ROTATION_STEP_MS + Math.max(0, stepCount - 1) * ROTATION_PAUSE_MS + 120
+      : FLIP_SIMULATION_MS;
 
     if (isRotation) {
       setSimulatingTransitionMs(ROTATION_STEP_MS);
@@ -239,7 +243,7 @@ export default function PlayStage({
       for (let step = 2; step <= stepCount; step += 1) {
         window.setTimeout(() => {
           setSimulatingRotationDegrees(step * 90);
-        }, ROTATION_STEP_MS * (step - 1) + 50);
+        }, rotationStepIntervalMs * (step - 1) + 50);
       }
     } else {
       setSimulatingTransitionMs(FLIP_SIMULATION_MS);
