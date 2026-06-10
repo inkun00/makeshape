@@ -168,6 +168,7 @@ export default function App() {
             onNext={handleNextProblem}
             onSolveStatusChange={handleSolveStatusChange}
             onPenalty={handlePenalty}
+            hintUses={performanceStats.hintUses || 0}
           />
         )}
 

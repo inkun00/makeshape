@@ -42,7 +42,17 @@ function OperationArrow({ label, axis = 'horizontal' }) {
   );
 }
 
-export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange, onPenalty, isSolvedPrev }) {
+const MAX_HINT_USES = 10;
+
+export default function PlayStage({
+  problem,
+  onBack,
+  onNext,
+  onSolveStatusChange,
+  onPenalty,
+  hintUses = 0,
+  isSolvedPrev
+}) {
   const [userVertices, setUserVertices] = useState([]);
   const [intermediateUserVertices, setIntermediateUserVertices] = useState([]);
   const [originalUserVertices, setOriginalUserVertices] = useState([]);
@@ -58,6 +68,7 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
     : null;
   const finalVertices = transformVertices(problem.originalVertices, problem.action);
   const correctVertices = finalVertices;
+  const remainingHints = Math.max(0, MAX_HINT_USES - hintUses);
 
   const triggerToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -211,9 +222,14 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
   };
 
   const handleShowHint = () => {
+    if (remainingHints <= 0) {
+      triggerToast('힌트는 전체 학습에서 최대 10회까지만 볼 수 있습니다.', 'error');
+      return;
+    }
+
     setHintActive(true);
     onPenalty?.('hint');
-    triggerToast('정답의 윤곽선을 초록색 점선으로 표시했습니다.', 'success');
+    triggerToast(`정답의 윤곽선을 초록색 점선으로 표시했습니다. 남은 힌트 ${remainingHints - 1}회`, 'success');
   };
 
   const renderOperationIndicator = () => {
@@ -442,8 +458,8 @@ export default function PlayStage({ problem, onBack, onNext, onSolveStatusChange
           <button className="btn btn-secondary" onClick={handleReset} disabled={isSimulating}>
             초기화
           </button>
-          <button className="btn btn-secondary" onClick={handleShowHint} disabled={isSolved || hintActive}>
-            힌트 보기
+          <button className="btn btn-secondary" onClick={handleShowHint} disabled={isSolved || hintActive || remainingHints <= 0}>
+            힌트 보기 ({remainingHints}/10)
           </button>
         </div>
 
