@@ -190,7 +190,7 @@ function drawCharacter(ctx, levelInfo, x, y) {
   ctx.restore();
 }
 
-function drawGeneratedCharacter(ctx, image, levelInfo, x, y) {
+function drawGeneratedCharacter(ctx, image, levelInfo, x, y, radius = 155) {
   if (!image) return false;
 
   const columns = 5;
@@ -204,16 +204,16 @@ function drawGeneratedCharacter(ctx, image, levelInfo, x, y) {
 
   ctx.save();
   ctx.beginPath();
-  ctx.arc(x, y, 205, 0, Math.PI * 2);
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, x - 205, y - 205, 410, 410);
+  ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, x - radius, y - radius, radius * 2, radius * 2);
   ctx.restore();
 
   ctx.save();
   ctx.strokeStyle = levelInfo.colors[0];
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 8;
   ctx.beginPath();
-  ctx.arc(x, y, 206, 0, Math.PI * 2);
+  ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 
@@ -248,24 +248,24 @@ function drawCertificate(canvas, stats, characterSheet = null) {
   drawRoundedRect(ctx, 92, 92, width - 184, height - 184, 24);
   ctx.stroke();
 
-  drawText(ctx, '도형 이동 학습 인증서', width / 2, 170, 900, 'bold 72px Arial', '#111827');
-  drawText(ctx, '모든 회전과 뒤집기 스테이지를 끝까지 해결했습니다.', width / 2, 245, 920, '32px Arial', '#475569');
+  drawText(ctx, '도형 이동 학습 인증서', width / 2, 160, 900, 'bold 66px Arial', '#111827');
+  drawText(ctx, '모든 회전과 뒤집기 스테이지를 끝까지 해결했습니다.', width / 2, 230, 920, '30px Arial', '#475569');
 
-  const usedGeneratedCharacter = drawGeneratedCharacter(ctx, characterSheet, levelInfo, width / 2, 445);
+  const usedGeneratedCharacter = drawGeneratedCharacter(ctx, characterSheet, levelInfo, width / 2, 430, 155);
   if (!usedGeneratedCharacter) {
-    drawCharacter(ctx, levelInfo, width / 2, 455);
+    drawCharacter(ctx, levelInfo, width / 2, 430);
   }
 
-  drawText(ctx, `${levelInfo.level}단계 · ${levelInfo.title}`, width / 2, 690, 900, 'bold 58px Arial', levelInfo.colors[0]);
-  drawText(ctx, levelInfo.subtitle, width / 2, 755, 900, 'bold 42px Arial', '#111827');
-  drawText(ctx, `누적 오답 ${stats?.wrongAttempts || 0}회 · 힌트 ${stats?.hintUses || 0}회 · 총 페널티 ${totalPenalty}회`, width / 2, 820, 900, '28px Arial', '#64748b');
+  drawText(ctx, `${levelInfo.level}단계 · ${levelInfo.title}`, width / 2, 640, 900, 'bold 54px Arial', levelInfo.colors[0]);
+  drawText(ctx, levelInfo.subtitle, width / 2, 705, 900, 'bold 40px Arial', '#111827');
+  drawText(ctx, `누적 오답 ${stats?.wrongAttempts || 0}회 · 힌트 ${stats?.hintUses || 0}회 · 총 페널티 ${totalPenalty}회`, width / 2, 775, 900, '28px Arial', '#64748b');
 
   const issuedAt = new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   }).format(new Date());
-  drawText(ctx, issuedAt, width / 2, 890, 900, '26px Arial', '#475569');
+  drawText(ctx, issuedAt, width / 2, 845, 900, '26px Arial', '#475569');
 }
 
 export default function CertificateModal({ open, onClose, stats }) {
