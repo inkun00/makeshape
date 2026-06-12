@@ -77,131 +77,6 @@ function drawMathPattern(ctx) {
   ctx.restore();
 }
 
-function drawCharacter(ctx, levelInfo, x, y) {
-  const [mainColor, softColor] = levelInfo.colors;
-
-  ctx.save();
-  ctx.translate(x, y);
-
-  const glow = ctx.createRadialGradient(0, 20, 20, 0, 20, 185);
-  glow.addColorStop(0, softColor);
-  glow.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = glow;
-  ctx.beginPath();
-  ctx.arc(0, 20, 185, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = mainColor;
-  drawRoundedRect(ctx, -74, 30, 148, 142, 48);
-  ctx.fill();
-
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(0, -18, 86, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = mainColor;
-  ctx.lineWidth = 8;
-  ctx.stroke();
-
-  ctx.fillStyle = '#1f2937';
-  ctx.beginPath();
-  ctx.arc(-28, -28, 8, 0, Math.PI * 2);
-  ctx.arc(28, -28, 8, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = '#1f2937';
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.arc(0, -8, 34, 0.18 * Math.PI, 0.82 * Math.PI);
-  ctx.stroke();
-
-  ctx.fillStyle = softColor;
-  ctx.beginPath();
-  ctx.arc(-48, -2, 14, 0, Math.PI * 2);
-  ctx.arc(48, -2, 14, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#ffffff';
-  ctx.strokeStyle = mainColor;
-  ctx.lineWidth = 6;
-  drawRoundedRect(ctx, -58, 76, 116, 62, 20);
-  ctx.fill();
-  ctx.stroke();
-  drawText(ctx, levelInfo.formula, 0, 108, 96, 'bold 30px Arial', '#111827');
-
-  ctx.strokeStyle = mainColor;
-  ctx.lineWidth = 10;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(-74, 72);
-  ctx.lineTo(-126, 32);
-  ctx.moveTo(74, 72);
-  ctx.lineTo(126, 32);
-  ctx.stroke();
-
-  if (levelInfo.accessory === 'crown') {
-    ctx.fillStyle = '#facc15';
-    ctx.strokeStyle = '#a16207';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-54, -88);
-    ctx.lineTo(-30, -128);
-    ctx.lineTo(0, -88);
-    ctx.lineTo(30, -128);
-    ctx.lineTo(54, -88);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-  } else if (levelInfo.accessory === 'ruler') {
-    ctx.fillStyle = '#fde047';
-    ctx.strokeStyle = '#854d0e';
-    ctx.lineWidth = 4;
-    drawRoundedRect(ctx, -134, 18, 96, 24, 6);
-    ctx.fill();
-    ctx.stroke();
-  } else if (levelInfo.accessory === 'compass') {
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.arc(0, -18, 124, -0.2, 1.6);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(104, 44);
-    ctx.lineTo(120, 28);
-    ctx.lineTo(122, 52);
-    ctx.stroke();
-  } else if (levelInfo.accessory === 'mirror') {
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 5;
-    ctx.setLineDash([10, 8]);
-    ctx.beginPath();
-    ctx.moveTo(0, -128);
-    ctx.lineTo(0, 40);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  } else if (levelInfo.accessory === 'cube') {
-    ctx.strokeStyle = '#4f46e5';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(86, -120, 56, 56);
-    ctx.strokeRect(110, -96, 56, 56);
-    ctx.beginPath();
-    ctx.moveTo(142, -120);
-    ctx.lineTo(166, -96);
-    ctx.moveTo(86, -64);
-    ctx.lineTo(110, -40);
-    ctx.stroke();
-  } else {
-    ctx.fillStyle = mainColor;
-    ctx.beginPath();
-    ctx.arc(0, -112, 18 + levelInfo.level, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  ctx.restore();
-}
-
 function drawGeneratedCharacter(ctx, image, levelInfo, x, y, radius = 155) {
   if (!image) return false;
 
@@ -232,7 +107,21 @@ function drawGeneratedCharacter(ctx, image, levelInfo, x, y, radius = 155) {
   return true;
 }
 
-function drawCertificate(canvas, stats, characterSheet = null) {
+function drawCharacterPlaceholder(ctx, levelInfo, x, y, radius = 155, message = '캐릭터를 불러오는 중입니다') {
+  ctx.save();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+  ctx.strokeStyle = levelInfo.colors[0];
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  drawText(ctx, message, x, y - 10, radius * 1.6, 'bold 24px Arial', levelInfo.colors[0]);
+  drawText(ctx, '잠시만 기다려 주세요', x, y + 28, radius * 1.6, '20px Arial', '#64748b');
+  ctx.restore();
+}
+
+function drawCertificate(canvas, stats, characterSheet = null, characterMessage = '캐릭터를 불러오는 중입니다') {
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
@@ -263,9 +152,9 @@ function drawCertificate(canvas, stats, characterSheet = null) {
   drawText(ctx, '도형 이동 학습 인증서', width / 2, 160, 900, 'bold 66px Arial', '#111827');
   drawText(ctx, '모든 회전과 뒤집기 스테이지를 끝까지 해결했습니다.', width / 2, 230, 920, '30px Arial', '#475569');
 
-  const usedGeneratedCharacter = drawGeneratedCharacter(ctx, characterSheet, levelInfo, width / 2, 430, 155);
-  if (!usedGeneratedCharacter) {
-    drawCharacter(ctx, levelInfo, width / 2, 430);
+  const characterDrawn = drawGeneratedCharacter(ctx, characterSheet, levelInfo, width / 2, 430, 155);
+  if (!characterDrawn) {
+    drawCharacterPlaceholder(ctx, levelInfo, width / 2, 430, 155, characterMessage);
   }
 
   drawText(ctx, `${levelInfo.level}단계 · ${levelInfo.title}`, width / 2, 640, 900, 'bold 54px Arial', levelInfo.colors[0]);
@@ -284,6 +173,7 @@ export default function CertificateModal({ open, onClose, stats }) {
   const canvasRef = useRef(null);
   const [characterSet, setCharacterSet] = useState('boy');
   const [characterVariant, setCharacterVariant] = useState(0);
+  const [characterStatus, setCharacterStatus] = useState('loading');
   const characterSheetUrl = CHARACTER_SHEET_URLS[characterSet][characterVariant];
   const characterVariantCount = CHARACTER_SHEET_URLS[characterSet].length;
 
@@ -291,17 +181,20 @@ export default function CertificateModal({ open, onClose, stats }) {
     if (!open || !canvasRef.current) return;
     let cancelled = false;
     const canvas = canvasRef.current;
+    setCharacterStatus('loading');
     drawCertificate(canvas, stats);
 
     const image = new Image();
     image.onload = () => {
       if (!cancelled) {
+        setCharacterStatus('ready');
         drawCertificate(canvas, stats, image);
       }
     };
     image.onerror = () => {
       if (!cancelled) {
-        drawCertificate(canvas, stats);
+        setCharacterStatus('error');
+        drawCertificate(canvas, stats, null, '캐릭터를 불러오지 못했습니다');
       }
     };
     image.src = characterSheetUrl;
@@ -319,6 +212,10 @@ export default function CertificateModal({ open, onClose, stats }) {
   const handleSave = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (characterStatus !== 'ready') {
+      window.alert('캐릭터 이미지가 준비된 뒤 저장할 수 있습니다.');
+      return;
+    }
 
     canvas.toBlob((blob) => {
       if (!blob) return;
@@ -377,8 +274,8 @@ export default function CertificateModal({ open, onClose, stats }) {
             >
               캐릭터 바꾸기 ({characterVariant + 1}/{characterVariantCount})
             </button>
-            <button className="btn btn-primary" onClick={handleSave}>
-              이미지 저장
+            <button className="btn btn-primary" onClick={handleSave} disabled={characterStatus !== 'ready'}>
+              {characterStatus === 'ready' ? '이미지 저장' : '캐릭터 불러오는 중'}
             </button>
           </div>
         </div>
